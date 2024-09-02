@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">          
+</head>
+<body>
+    <nav>
+        <img src="./images/pokedexName-removebg-preview.png" alt="Texto Pokedex" class="imgPokeName">
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search Pokémon...">
+            <button type="button" id="search-btn">Search</button>
+        </div>
+        <div class="filter">
+            <label for="type-filter">Filtrar por tipo:</label>
+            <select id="type-filter">
+                <option value="">Todos los tipos</option>
+                <option value="normal" class="type-normal">Normal</option>
+                <option value="fire" class="type-fire">Fire</option>
+                <option value="water" class="type-water">Water</option>
+                <option value="grass" class="type-grass">Grass</option>
+                <option value="electric" class="type-electric">Electric</option>
+                <option value="ice" class="type-ice">Ice</option>
+                <option value="fighting" class="type-fighting">Fighting</option>
+                <option value="poison" class="type-poison">Poison</option>
+                <option value="ground" class="type-ground">Ground</option>
+                <option value="flying" class="type-flying">Flying</option>
+                <option value="psychic" class="type-psychic">Psychic</option>
+                <option value="bug" class="type-bug">Bug</option>
+                <option value="rock" class="type-rock">Rock</option>
+                <option value="ghost" class="type-ghost">Ghost</option>
+                <option value="dark" class="type-dark">Dark</option>
+                <option value="dragon" class="type-dragon">Dragon</option>
+                <option value="steel" class="type-steel">Steel</option>
+                <option value="fairy" class="type-fairy">Fairy</option>
+            </select>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="pokemon-grid">
+            </div>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
