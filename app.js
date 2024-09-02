@@ -2,31 +2,32 @@ const pokemonGrid = document.querySelector('.pokemon-grid');
 const typeFilter = document.getElementById('type-filter');
 const searchInput = document.getElementById('search');
 const searchBtn = document.getElementById('search-btn');
-const URL = 'https://pokeapi.co/api/v2/pokemon/';
 
-let allPokemons = [];
-let index=1;
-let limit=100;
+const URLGeneral = 'https://pokeapi.co/api/v2/pokemon/';
+const URLType = 'https://pokeapi.co/api/v2/type/';
+
+
+let index = 1;
+let limit = 100;
 
 async function loadPokemons() {
-    while(index<limit){
-        const response = await fetch(URL + index);
+    while(index < limit) {
+        const response = await fetch(URLGeneral + index);
         const data = await response.json();
-        allPokemons.push(data);
         showPokemon(data);
         index++;
     }
-    limit=limit+100;
-    addbButtonMorePokemons()
+    addButtonMorePokemons();
 }
 
-function addbButtonMorePokemons(){
+function addButtonMorePokemons() {
     const morePoke = document.createElement('button');
     morePoke.textContent = 'Load More';
     pokemonGrid.append(morePoke);
-    morePoke.addEventListener('click',()=>{
+    morePoke.addEventListener('click', () => {
         loadPokemons();
         morePoke.remove();
+        limit +=100;
     });
 }
 
@@ -55,24 +56,33 @@ function showPokemon(data) {
     pokemonGrid.append(div);
 }
 
-function filterPokemons() {
+async function filterPokemons() {
     const selectedType = typeFilter.value;
     const searchText = searchInput.value.toLowerCase(); 
-    pokemonGrid.innerHTML = ''; 
-    allPokemons.forEach(pokemon => {
-        const types = pokemon.types.map(type => type.type.name);
-        const name = pokemon.name.toLowerCase(); 
-        if (
-            (selectedType === '' || types.includes(selectedType)) &&
-            (name.includes(searchText) || searchText === '')
-        ) {
-            showPokemon(pokemon);
-        }
-    });
-    if (selectedType === '' && searchText===''){
-        addbButtonMorePokemons();
+    pokemonGrid.innerHTML = '';
+
+    if (selectedType !== '' && searchText==='') {
+        const response = await fetch(`${URLType}${selectedType}`);
+        const data = await response.json();
+        data.pokemon.forEach(pokemonEntry => {
+            const pokemonData = pokemonEntry.pokemon;
+            fetchAndShowPokemon(pokemonData.url);
+        });
+    } else if (searchText !== '') {
+        fetchAndShowPokemon(`${URLGeneral}${searchText}`);
+    } else {
+        index=1;
+        loadPokemons();
     }
 }
+
+async function fetchAndShowPokemon(url) {
+    const response = await fetch(url);
+    const data = await response.json();
+    showPokemon(data);
+}
+
+
 
 typeFilter.addEventListener('change', filterPokemons);
 searchBtn.addEventListener('click', filterPokemons);
