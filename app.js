@@ -9,20 +9,20 @@ const URLGeneral = 'https://pokeapi.co/api/v2/pokemon/';
 const URLType = 'https://pokeapi.co/api/v2/type/';
 const URLSpecies = 'https://pokeapi.co/api/v2/pokemon-species/'
 
-let inicio = 0;
-let limite = 20;
+let start = 0;
+let limit = 20;
 
 async function loadPokelinks(){
-    const response = await fetch(`${URLGeneral}?offset=${inicio}&limit=${limite}`);
+    const response = await fetch(`${URLGeneral}?offset=${start}&limit=${limit}`);
     const data = await response.json();
     
-    // Crear promesas para cargar todos los Pokémon
+    // Promises to load pokemons
     const pokemonPromises = data.results.map(pokemon => loadPokemon(pokemon.url));
     
-    // Esperar a que todas las promesas se resuelvan antes de añadir el botón
+    //Wait to all promises to be solved
     await Promise.all(pokemonPromises);
 
-    // Añadir el botón "Load More" después de que todos los Pokémon se hayan cargado
+    // Add button after all promises
     addButtonMorePokemons();
 }
 
@@ -39,14 +39,14 @@ function addButtonMorePokemons() {
     main.append(morePoke);
 
     morePoke.addEventListener('click', () => {
-        morePoke.remove(); // Remover el botón antes de cargar más Pokémon
-        inicio += limite;  // Incrementar el valor de `inicio`
-        loadPokelinks();   // Cargar más Pokémon
+        morePoke.remove(); 
+        start += limit;  
+        loadPokelinks();  
     });
 
 }
 
-// Modifica la función `showPokemon` para añadir el evento de clic
+// Function to show pokemons
 function showPokemon(data) {
     let tipos = data.types.map(type => type.type.name);
     if (tipos.length === 1) {
@@ -70,15 +70,14 @@ function showPokemon(data) {
             <p class="stat">${data.weight}kg</p>
         </div>`;
     
-    // Añadir evento de clic a la tarjeta de Pokémon
     div.addEventListener('click', () => {
-        loadPokemonSpecies(data.id);  // Cargar detalles del Pokémon en el modal
+        loadPokemonSpecies(data.id);
     });
 
     pokemonGrid.append(div);
 }
 
-
+// Function to filter pokemons by type or search them
 async function filterPokemons() {
     const selectedType = typeFilter.value;
     const searchText = searchInput.value.toLowerCase(); 
@@ -94,32 +93,33 @@ async function filterPokemons() {
     } else if (searchText !== '') {
         loadPokemon(`${URLGeneral}${searchText}`);
     } else {
-        inicio = 0; // Reiniciar el índice cuando no hay filtros aplicados
-        loadPokelinks(); // Cargar los Pokémon de manera predeterminada
+        start = 0; 
+        loadPokelinks();
     }
     const button = document.querySelector('.load-more-btn')
     button.remove();
 }
 
-// Función para mostrar el modal
+
 function showModal() {
     modal.style.display = 'block';
 }
 
-// Cerrar el modal cuando se hace clic fuera de él
 window.addEventListener('click', (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
 });
 
-//Funcion para traer la informacion del endpoint pokemon-species
+//Load data from species endpoint
 async function loadPokemonSpecies(id){
     const response = await fetch(`${URLSpecies}${id}`);
     const data = await response.json();
     showPokemonSpecies(data,id)
 }
-// Función para mostrar la información de pokemon-species
+
+
+//show modal with info from species endpoint
 async function showPokemonSpecies(data,id) {
     const description = data.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
     const habitat = data.habitat ? data.habitat.name : 'Unknown';
@@ -137,7 +137,6 @@ async function showPokemonSpecies(data,id) {
 
         </div>`;
 
-    // Mostrar el modal
     showModal();
     const closeModalBtn = modal.querySelector('.close');
     closeModalBtn.addEventListener('click', () => {
@@ -146,11 +145,8 @@ async function showPokemonSpecies(data,id) {
 
 }
 
-
-// Event listeners para filtros y búsqueda
 typeFilter.addEventListener('change', filterPokemons);
 searchBtn.addEventListener('click', filterPokemons);
 searchInput.addEventListener('input', filterPokemons);
 
-// Cargar la lista inicial de Pokémon
 loadPokelinks();
