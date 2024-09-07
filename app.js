@@ -153,7 +153,7 @@ function resetPokemonGrid() {
 
 // Show the modal with Pokémon information
 function showModal() {
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 // Close the modal if clicked outside of it
@@ -184,12 +184,14 @@ function showPokemonSpecies(data, id) {
 
     modal.innerHTML = `
         <div class="modal-content">
+            <div>
             <span class="close">&times;</span>
             <h2>${data.name} shiny</h2>
             <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${id}.png" alt="${data.name}">
             <p>${description}</p>
             <p><b>Habitat</b>: ${habitat}</p>
             <p><b>Generation</b>: ${generation}</p>
+            </div>
         </div>`;
 
     showModal();

@@ -188,7 +188,9 @@ main {
 }
 
 .modal {
-    display: none;
+    display: flex;
+    align-items: center;
+    height: 100vh;
     position: fixed;
     z-index: 1;
     left: 0;
@@ -200,6 +202,8 @@ main {
 
     .modal-content {
         background-color: #fff;
+        display: flex;
+        align-items: center;
         margin: 10% auto;
         padding: 20px;
         border-radius: 10px;
@@ -305,7 +309,7 @@ main {
     .modal-content {
         width: 90%;
         padding: 10px;
-        height: 75vh; 
+        height: 60vh;
         
         img {
             width: 70%;
