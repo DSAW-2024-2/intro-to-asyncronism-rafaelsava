@@ -291,9 +291,12 @@ main {
 }
 
 @media (max-width: 576px) {
-    .pokemon-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+
+    .pokemon-card{
+        width: 90%;
+        margin: 0 auto;
     }
+
 
     .container {
         width: 80%;
@@ -302,7 +305,8 @@ main {
     .modal-content {
         width: 90%;
         padding: 10px;
-
+        height: 75vh; 
+        
         img {
             width: 70%;
         }
