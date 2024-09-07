@@ -1,3 +1,8 @@
+// === Constants ===
+const URLGeneral = 'https://pokeapi.co/api/v2/pokemon/';
+const URLType = 'https://pokeapi.co/api/v2/type/';
+const URLSpecies = 'https://pokeapi.co/api/v2/pokemon-species/';
+
 const pokemonGrid = document.querySelector('.pokemon-grid');
 const main = document.querySelector('main');
 const typeFilter = document.getElementById('type-filter');
@@ -6,25 +11,26 @@ const modal = document.getElementById('pokemon-modal');
 const btnSearch = document.getElementById('search-btn');
 const imgPokedex = document.querySelector('.imgPokeName');
 
-const URLGeneral = 'https://pokeapi.co/api/v2/pokemon/';
-const URLType = 'https://pokeapi.co/api/v2/type/';
-const URLSpecies = 'https://pokeapi.co/api/v2/pokemon-species/';
-
+// State variables
 let start = 0;
 let limit = 20;
 
+// === Utility Functions ===
+
+// Function to fetch data from the API
 async function fetchData(url) {
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
     } catch (error) {
         console.error("Error fetching data:", error);
     }
 }
 
+// === Pokémon Loading Functions ===
+
+// Load Pokémon links
 async function loadPokelinks() {
     const data = await fetchData(`${URLGeneral}?offset=${start}&limit=${limit}`);
     if (data) {
@@ -34,45 +40,47 @@ async function loadPokelinks() {
     }
 }
 
+// Load an individual Pokémon
 async function loadPokemon(url) {
-    let loader = document.querySelector('.loader');
+    showLoader();
     
-    if (!loader) {
-        loader = document.createElement('div');
-        loader.classList.add('loader');
-        pokemonGrid.append(loader);  
-    }
-
-    loader.style.display = 'block'; 
-
     const data = await fetchData(url);
     if (data) {
         showPokemon(data);
-        loader.style.display = 'none'; 
-        return true; 
+        hideLoader();
+        return true;
     } else {
-        pokemonGrid.innerHTML = '<p class="no-pokemon">This pokemon doesn\'t exist.<br>Click on pokedex image to come back.</p>';
-        loader.style.display = 'none'; 
-        return false; 
-    } 
+        showErrorMessage();
+        hideLoader();
+        return false;
+    }
 }
 
-function addButtonMorePokemons() {
-    const existingButton = document.querySelector('.load-more-btn');
-    if (existingButton) existingButton.remove();
-
-    const morePoke = document.createElement('button');
-    morePoke.textContent = 'Load More';
-    morePoke.classList.add('load-more-btn');
-    main.append(morePoke);
-
-    morePoke.addEventListener('click', () => {
-        morePoke.remove(); 
-        start += limit;
-        loadPokelinks();
-    });
+// Show an error message in the grid
+function showErrorMessage() {
+    pokemonGrid.innerHTML = '<p class="no-pokemon">This pokemon doesn\'t exist.<br>Click on pokedex image to come back.</p>';
 }
 
+// Show the loader
+function showLoader() {
+    let loader = document.querySelector('.loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.classList.add('loader');
+        pokemonGrid.append(loader);
+    }
+    loader.style.display = 'block';
+}
+
+// Hide the loader
+function hideLoader() {
+    const loader = document.querySelector('.loader');
+    if (loader) loader.style.display = 'none';
+}
+
+// === UI Functions ===
+
+// Display a Pokémon in the grid
 function showPokemon(data) {
     const tipos = data.types.map(type => `<p class="type-${type.type.name} type">${type.type.name}</p>`).join('');
     
@@ -93,17 +101,35 @@ function showPokemon(data) {
     pokemonGrid.append(div);
 }
 
-async function filterPokemons() {
-    const selectedType = typeFilter.value;
-    const searchText = searchInput.value.toLowerCase();
-    const reloadMessage = document.querySelector('.reload-message');
-    if (reloadMessage) {
-        reloadMessage.remove();
-    }
+// Add the button to load more Pokémon
+function addButtonMorePokemons() {
+    removeExistingLoadMoreButton();
 
-    pokemonGrid.innerHTML = '';
+    const morePoke = document.createElement('button');
+    morePoke.textContent = 'Load More';
+    morePoke.classList.add('load-more-btn');
+    main.append(morePoke);
+
+    morePoke.addEventListener('click', () => {
+        morePoke.remove();
+        start += limit;
+        loadPokelinks();
+    });
+}
+
+// Remove the existing "Load More" button
+function removeExistingLoadMoreButton() {
     const existingButton = document.querySelector('.load-more-btn');
     if (existingButton) existingButton.remove();
+}
+
+// === Filtering Functions ===
+
+// Filter Pokémon by type or search
+async function filterPokemons() {
+    resetPokemonGrid();
+    const selectedType = typeFilter.value;
+    const searchText = searchInput.value.toLowerCase();
 
     if (selectedType && !searchText) {
         const data = await fetchData(`${URLType}${selectedType}`);
@@ -111,29 +137,44 @@ async function filterPokemons() {
             const promises = data.pokemon.map(pokemonEntry => loadPokemon(pokemonEntry.pokemon.url));
             await Promise.all(promises);
         }
-    } else if(!selectedType && !searchText){
+    } else if (!selectedType && !searchText) {
         start = 0;
         loadPokelinks();
     }
 }
 
+// Reset the grid and buttons
+function resetPokemonGrid() {
+    pokemonGrid.innerHTML = '';
+    removeExistingLoadMoreButton();
+}
+
+// === Modal Functions ===
+
+// Show the modal with Pokémon information
 function showModal() {
     modal.style.display = 'block';
 }
 
+// Close the modal if clicked outside of it
 window.addEventListener('click', (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
 });
 
+// Load Pokémon species and show in the modal
 async function loadPokemonSpecies(id) {
     const data = await fetchData(`${URLSpecies}${id}`);
     if (data) {
         showPokemonSpecies(data, id);
     }
+    else{
+        window.alert('It is likely that there is still no information in \'pokemon species\' about this pokemon.')
+    }
 }
 
+// Display Pokémon species information in the modal
 function showPokemonSpecies(data, id) {
     let description = data.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
     description = description.replace(/\u000c/g, ' ');
@@ -159,45 +200,60 @@ function showPokemonSpecies(data, id) {
     });
 }
 
+// === Search Functions ===
+
+// Handle Pokémon search by name or ID
 async function handlePokemonSearch() {
     const searchText = searchInput.value.trim().toLowerCase();
-    const validInput = /^[a-z0-9]+$/i;
+    const validInput = /^[a-z0-9-]+$/i;
 
     if (validInput.test(searchText)) {
         const success = await loadPokemon(`${URLGeneral}${searchText}`);
-        if(success){
-            const message = document.createElement('p');
-            message.classList.add('reload-message');
-            message.textContent = 'Click on Pokedex image to go back.';
-            main.append(message);
+        if (success) {
+            showReloadMessage();
         }
         searchInput.value = '';
     } else {
-        window.alert('Please enter a valid Pokemon name (letters and numbers only).');
+        window.alert('Please enter a valid Pokemon name (letters, numbers, and hyphens only).');
     }
 }
 
+// Show a reload message
+function showReloadMessage() {
+    const message = document.createElement('p');
+    message.classList.add('reload-message');
+    message.textContent = 'Click on Pokedex image to go back.';
+    main.append(message);
+}
+
+// === Event Listeners ===
 typeFilter.addEventListener('change', filterPokemons);
-searchInput.addEventListener('input', filterPokemons);
-btnSearch.addEventListener('click', handlePokemonSearch);
-searchInput.addEventListener('keydown', async (event) => {
-    if (event.key === 'Enter') {
-        handlePokemonSearch();
-    }
+searchInput.addEventListener('input', () => {
+    typeFilter.value = '';
+    const reloadMessage = document.querySelector('.reload-message');
+    if (reloadMessage) reloadMessage.remove();
+    filterPokemons();
 });
-
-
+btnSearch.addEventListener('click', handlePokemonSearch);
+searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') handlePokemonSearch();
+});
 
 imgPokedex.addEventListener('click', () => {
-    typeFilter.value = '';
-    searchInput.value = '';
-    pokemonGrid.innerHTML = '';
-    start = 0;
+    resetFilters();
     loadPokelinks();
-    const reloadMessage = document.querySelector('.reload-message');
-    if (reloadMessage) {
-        reloadMessage.remove();
-    }
 });
 
+// Reset filters and reload Pokémon list
+function resetFilters() {
+    typeFilter.value = '';
+    searchInput.value = '';
+    resetPokemonGrid();
+    start = 0;
+    const reloadMessage = document.querySelector('.reload-message');
+    if (reloadMessage) reloadMessage.remove();
+}
+
+// Initialization
+resetFilters();
 loadPokelinks();
