@@ -211,6 +211,9 @@ main {
         max-width: 500px;
         text-align: center;
 
+        div{
+            width: 100%;
+        }
         img {
             width: 50%;
             height: auto;
@@ -309,10 +312,16 @@ main {
     .modal-content {
         width: 90%;
         padding: 10px;
-        height: 60vh;
+        height: 85vh;
+
+        div{
+            width: 100%;
+        }
         
         img {
-            width: 70%;
+            width: 90% !important;
+            max-width: 280px;
+            height: auto;
         }
     }
 
