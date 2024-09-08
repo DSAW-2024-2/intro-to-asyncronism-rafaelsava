@@ -312,7 +312,7 @@ main {
     .modal-content {
         width: 90%;
         padding: 10px;
-        height: 85vh;
+        height: 80vh;
 
         div{
             width: 100%;
@@ -320,7 +320,7 @@ main {
         
         img {
             width: 90% !important;
-            max-width: 280px;
+            max-width: 250px;
             height: auto;
         }
     }
